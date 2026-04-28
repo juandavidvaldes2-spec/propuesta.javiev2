@@ -1,0 +1,1236 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Plasma Flow — Cepillo rizador con tecnología de plasma</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,700&display=swap');
+
+  :root {
+    --bg: #fbfbfd;
+    --bg-warm: #faf6f0;
+    --bg-soft: #f5ede0;
+    --ink: #1d1d1f;
+    --ink-soft: #424245;
+    --ink-mute: #86868b;
+    --line: #e8e3d8;
+    --copper: #b87333;
+    --copper-dark: #8b5a26;
+    --gold: #d4af37;
+    --chocolate: #3e2723;
+    --cream: #f5ede0;
+    --rose-gold: #d4a574;
+    --dark: #1a1310;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+  }
+
+  /* ===== NAV (Apple-style with Liquid Glass) ===== */
+  .nav {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: rgba(251, 251, 253, 0.72);
+    backdrop-filter: saturate(180%) blur(20px);
+    -webkit-backdrop-filter: saturate(180%) blur(20px);
+    border-bottom: 1px solid rgba(232, 227, 216, 0.6);
+  }
+  .nav-inner {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 14px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .nav-logo {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-weight: 700;
+    font-size: 18px;
+    letter-spacing: -0.5px;
+    color: var(--ink);
+  }
+  .nav-links { display: flex; gap: 32px; align-items: center; }
+  .nav-links a {
+    color: var(--ink);
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 400;
+    transition: opacity 0.2s;
+  }
+  .nav-links a:hover { opacity: 0.6; }
+  .nav-cta {
+    background: var(--ink);
+    color: #fff !important;
+    padding: 7px 16px;
+    border-radius: 980px;
+    font-weight: 500 !important;
+    font-size: 12px !important;
+  }
+
+  /* ===== HERO (Apple Keynote) ===== */
+  .hero {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 60px 24px 40px;
+    background:
+      radial-gradient(ellipse 80% 60% at 50% 50%, rgba(212, 165, 116, 0.12), transparent 60%),
+      radial-gradient(ellipse 60% 80% at 50% 100%, rgba(184, 115, 51, 0.06), transparent 60%),
+      var(--bg);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero-eyebrow {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--copper);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 24px;
+    opacity: 0;
+    animation: fadeUp 0.8s ease 0.1s forwards;
+  }
+
+  .hero-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(4rem, 12vw, 9rem);
+    line-height: 0.95;
+    letter-spacing: -0.04em;
+    font-weight: 700;
+    color: var(--ink);
+    margin-bottom: 20px;
+    opacity: 0;
+    animation: fadeUp 1s ease 0.2s forwards;
+  }
+  .hero-title .italic {
+    font-style: italic;
+    font-weight: 400;
+    background: linear-gradient(135deg, var(--copper), var(--chocolate));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .hero-tagline {
+    font-size: clamp(1.1rem, 2vw, 1.5rem);
+    color: var(--ink-soft);
+    font-weight: 300;
+    max-width: 580px;
+    margin: 0 auto 60px;
+    line-height: 1.4;
+    letter-spacing: -0.01em;
+    opacity: 0;
+    animation: fadeUp 1s ease 0.4s forwards;
+  }
+
+  /* Product showcase */
+  .hero-product {
+    position: relative;
+    width: clamp(280px, 55vw, 560px);
+    aspect-ratio: 1 / 1;
+    margin: 0 auto 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    animation: fadeUp 1.2s ease 0.6s forwards, float 6s ease-in-out 1.8s infinite;
+  }
+  .hero-product::before {
+    content: '';
+    position: absolute;
+    bottom: -10%;
+    left: 15%;
+    right: 15%;
+    height: 60px;
+    background: radial-gradient(ellipse at center, rgba(62, 39, 35, 0.25), transparent 65%);
+    filter: blur(20px);
+    z-index: 0;
+  }
+  .hero-product svg {
+    position: relative;
+    z-index: 2;
+    width: 100%;
+    height: 100%;
+    filter: drop-shadow(0 30px 60px rgba(62, 39, 35, 0.18));
+  }
+
+  /* Price + CTA cluster */
+  .hero-cta {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+    opacity: 0;
+    animation: fadeUp 1s ease 0.8s forwards;
+  }
+  .hero-price {
+    display: flex;
+    align-items: baseline;
+    gap: 14px;
+  }
+  .hero-price .current {
+    font-size: clamp(1.6rem, 3vw, 2.2rem);
+    font-weight: 600;
+    color: var(--ink);
+    letter-spacing: -0.02em;
+  }
+  .hero-price .from {
+    font-size: 13px;
+    color: var(--ink-mute);
+    font-weight: 400;
+  }
+  .hero-price .original {
+    font-size: 1.1rem;
+    color: var(--ink-mute);
+    text-decoration: line-through;
+  }
+
+  .btn-apple {
+    background: var(--ink);
+    color: #fff;
+    padding: 14px 36px;
+    border-radius: 980px;
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 15px;
+    letter-spacing: -0.01em;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    border: none;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .btn-apple:hover {
+    background: #000;
+    transform: translateY(-1px);
+    box-shadow: 0 12px 30px rgba(0,0,0,0.15);
+  }
+  .btn-apple .arrow {
+    transition: transform 0.3s;
+  }
+  .btn-apple:hover .arrow { transform: translateX(4px); }
+
+  .hero-meta {
+    display: flex;
+    gap: 24px;
+    margin-top: 16px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .hero-meta-item {
+    font-size: 12px;
+    color: var(--ink-mute);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    letter-spacing: -0.01em;
+  }
+  .hero-meta-item::before {
+    content: '';
+    width: 4px;
+    height: 4px;
+    background: var(--copper);
+    border-radius: 50%;
+  }
+
+  /* Scroll indicator */
+  .scroll-cue {
+    position: absolute;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%);
+    color: var(--ink-mute);
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    opacity: 0;
+    animation: fadeUp 1s ease 1.2s forwards;
+  }
+  .scroll-cue .line {
+    width: 1px;
+    height: 30px;
+    background: linear-gradient(180deg, transparent, var(--ink-mute));
+    animation: scrollPulse 2s ease-in-out infinite;
+  }
+
+  /* ===== SECTIONS ===== */
+  section { padding: 140px 24px; }
+  .section-inner {
+    max-width: 1180px;
+    margin: 0 auto;
+  }
+  .section-eyebrow {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--copper);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 20px;
+    text-align: center;
+    display: block;
+  }
+  .section-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2.4rem, 5vw, 4rem);
+    line-height: 1.05;
+    letter-spacing: -0.03em;
+    font-weight: 700;
+    text-align: center;
+    margin-bottom: 24px;
+    color: var(--ink);
+  }
+  .section-title .italic {
+    font-style: italic;
+    font-weight: 400;
+    background: linear-gradient(135deg, var(--copper), var(--chocolate));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .section-lead {
+    font-size: clamp(1.05rem, 1.6vw, 1.25rem);
+    color: var(--ink-soft);
+    text-align: center;
+    max-width: 640px;
+    margin: 0 auto 80px;
+    font-weight: 300;
+    line-height: 1.5;
+  }
+
+  /* ===== PROBLEMA — full bleed dark ===== */
+  .section-dark {
+    background: var(--dark);
+    color: var(--cream);
+  }
+  .section-dark .section-title { color: var(--cream); }
+  .section-dark .section-lead { color: rgba(245, 237, 224, 0.7); }
+  .section-dark .section-eyebrow { color: var(--rose-gold); }
+
+  .problem-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1px;
+    background: rgba(245, 237, 224, 0.12);
+    border-radius: 24px;
+    overflow: hidden;
+  }
+  .problem-card {
+    background: var(--dark);
+    padding: 50px 36px;
+    transition: background 0.3s;
+  }
+  .problem-card:hover { background: #221814; }
+  .problem-num {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-size: 3rem;
+    color: var(--copper);
+    margin-bottom: 24px;
+    line-height: 1;
+  }
+  .problem-card h3 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-bottom: 12px;
+    color: var(--cream);
+    letter-spacing: -0.01em;
+  }
+  .problem-card p {
+    color: rgba(245, 237, 224, 0.65);
+    font-size: 0.95rem;
+    line-height: 1.6;
+  }
+
+  /* ===== TECNOLOGIA — split apple style ===== */
+  .tech {
+    background: var(--bg);
+  }
+  .tech-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    margin-top: 60px;
+  }
+  .tech-card {
+    background: var(--bg-warm);
+    border-radius: 28px;
+    padding: 60px 48px;
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .tech-card:hover { transform: translateY(-4px); }
+  .tech-card::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -30%;
+    width: 400px;
+    height: 400px;
+    background: radial-gradient(circle, rgba(184, 115, 51, 0.18), transparent 65%);
+    pointer-events: none;
+  }
+  .tech-card.alt::before {
+    background: radial-gradient(circle, rgba(212, 175, 55, 0.18), transparent 65%);
+  }
+  .tech-tag {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--copper);
+    margin-bottom: 28px;
+    position: relative;
+    z-index: 2;
+  }
+  .tech-card h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(1.6rem, 2.5vw, 2.2rem);
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+    font-weight: 700;
+    margin-bottom: 16px;
+    color: var(--ink);
+    position: relative;
+    z-index: 2;
+  }
+  .tech-card p {
+    color: var(--ink-soft);
+    font-size: 1.02rem;
+    line-height: 1.6;
+    font-weight: 300;
+    position: relative;
+    z-index: 2;
+  }
+
+  /* ===== BENEFICIOS ===== */
+  .benefits {
+    background: var(--bg-warm);
+  }
+  .benefits-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1px;
+    background: var(--line);
+    border-radius: 24px;
+    overflow: hidden;
+    margin-top: 60px;
+  }
+  .benefit-card {
+    background: var(--bg-warm);
+    padding: 50px 36px;
+    transition: background 0.3s;
+  }
+  .benefit-card:hover { background: var(--bg-soft); }
+  .benefit-icon-wrap {
+    width: 48px;
+    height: 48px;
+    border-radius: 14px;
+    background: rgba(184, 115, 51, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 24px;
+  }
+  .benefit-icon-wrap svg {
+    width: 22px;
+    height: 22px;
+    stroke: var(--copper);
+    stroke-width: 1.5;
+    fill: none;
+  }
+  .benefit-card h3 {
+    font-size: 1.15rem;
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: var(--ink);
+    letter-spacing: -0.01em;
+  }
+  .benefit-card p {
+    color: var(--ink-soft);
+    font-size: 0.92rem;
+    line-height: 1.6;
+    font-weight: 300;
+  }
+
+  /* ===== ESPECIFICACIONES ===== */
+  .specs {
+    background: var(--bg);
+  }
+  .specs-table {
+    margin-top: 60px;
+    border-top: 1px solid var(--line);
+  }
+  .spec-row {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    padding: 24px 0;
+    border-bottom: 1px solid var(--line);
+    align-items: center;
+  }
+  .spec-label {
+    font-size: 0.95rem;
+    color: var(--ink-mute);
+    font-weight: 400;
+  }
+  .spec-value {
+    font-size: 1.05rem;
+    color: var(--ink);
+    font-weight: 500;
+    letter-spacing: -0.01em;
+  }
+
+  /* ===== COMPARACION ===== */
+  .compare {
+    background: var(--bg-warm);
+  }
+  .compare-table {
+    margin-top: 60px;
+    background: #fff;
+    border-radius: 24px;
+    overflow: hidden;
+    box-shadow: 0 1px 0 var(--line), 0 30px 80px rgba(62, 39, 35, 0.08);
+  }
+  .compare-row {
+    display: grid;
+    grid-template-columns: 1.5fr 1fr 1fr 1fr;
+    border-bottom: 1px solid var(--line);
+  }
+  .compare-row:last-child { border-bottom: none; }
+  .compare-row > div {
+    padding: 22px 24px;
+    font-size: 0.95rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--ink);
+  }
+  .compare-row > div:first-child {
+    justify-content: flex-start;
+    color: var(--ink);
+    font-weight: 500;
+  }
+  .compare-row.head > div {
+    background: var(--bg-warm);
+    color: var(--ink-mute);
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    font-weight: 600;
+    padding: 18px 24px;
+  }
+  .compare-row.head .pf-col {
+    background: var(--ink);
+    color: #fff;
+    border-radius: 0;
+  }
+  .pf-col {
+    background: rgba(184, 115, 51, 0.08);
+    font-weight: 600;
+  }
+  .yes { color: #2d7a3a; font-size: 1.4rem; font-weight: 700; }
+  .no { color: var(--ink-mute); font-size: 1.4rem; font-weight: 300; }
+
+  /* ===== TESTIMONIOS ===== */
+  .testi { background: var(--bg); }
+  .testi-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+    margin-top: 60px;
+  }
+  .testi-card {
+    background: var(--bg-warm);
+    border-radius: 24px;
+    padding: 40px;
+  }
+  .testi-stars {
+    color: var(--copper);
+    margin-bottom: 20px;
+    font-size: 1rem;
+    letter-spacing: 2px;
+  }
+  .testi-quote {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.15rem;
+    line-height: 1.5;
+    color: var(--ink);
+    margin-bottom: 28px;
+    font-weight: 400;
+    letter-spacing: -0.01em;
+  }
+  .testi-author {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .testi-avatar {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--copper), var(--chocolate));
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    font-size: 13px;
+  }
+  .testi-name { font-size: 0.92rem; font-weight: 600; color: var(--ink); }
+  .testi-role { font-size: 0.78rem; color: var(--ink-mute); }
+  .testi-note {
+    text-align: center;
+    margin-top: 32px;
+    color: var(--ink-mute);
+    font-size: 0.78rem;
+    font-style: italic;
+  }
+
+  /* ===== FAQ ===== */
+  .faq { background: var(--bg-warm); }
+  .faq-list {
+    max-width: 760px;
+    margin: 60px auto 0;
+  }
+  .faq-item {
+    border-bottom: 1px solid var(--line);
+    overflow: hidden;
+  }
+  .faq-item:first-child { border-top: 1px solid var(--line); }
+  .faq-item summary {
+    padding: 24px 0;
+    cursor: pointer;
+    font-weight: 500;
+    font-size: 1.05rem;
+    color: var(--ink);
+    list-style: none;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    letter-spacing: -0.01em;
+  }
+  .faq-item summary::-webkit-details-marker { display: none; }
+  .faq-item summary::after {
+    content: '+';
+    font-size: 1.4rem;
+    color: var(--ink-mute);
+    transition: transform 0.3s;
+    font-weight: 300;
+  }
+  .faq-item[open] summary::after {
+    transform: rotate(45deg);
+  }
+  .faq-item .answer {
+    padding: 0 0 24px;
+    color: var(--ink-soft);
+    font-size: 0.98rem;
+    line-height: 1.65;
+    font-weight: 300;
+  }
+
+  /* ===== GARANTIA — minimal apple style ===== */
+  .warranty {
+    background: var(--bg);
+    text-align: center;
+  }
+  .warranty .section-inner { max-width: 720px; }
+  .warranty-icon {
+    width: 64px;
+    height: 64px;
+    margin: 0 auto 24px;
+    border-radius: 20px;
+    background: linear-gradient(135deg, rgba(184, 115, 51, 0.12), rgba(212, 175, 55, 0.18));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .warranty-icon svg {
+    width: 32px;
+    height: 32px;
+    stroke: var(--copper);
+    stroke-width: 1.5;
+    fill: none;
+  }
+
+  /* ===== CTA FINAL ===== */
+  .cta-final {
+    background: var(--ink);
+    color: var(--cream);
+    text-align: center;
+    padding: 160px 24px;
+    position: relative;
+    overflow: hidden;
+  }
+  .cta-final::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 800px;
+    height: 800px;
+    background: radial-gradient(circle, rgba(184, 115, 51, 0.18), transparent 60%);
+    pointer-events: none;
+  }
+  .cta-final-inner { position: relative; z-index: 2; max-width: 720px; margin: 0 auto; }
+  .cta-final h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2.5rem, 6vw, 4.5rem);
+    line-height: 1;
+    letter-spacing: -0.03em;
+    font-weight: 700;
+    color: var(--cream);
+    margin-bottom: 24px;
+  }
+  .cta-final h2 .italic {
+    font-style: italic;
+    font-weight: 400;
+    background: linear-gradient(135deg, var(--rose-gold), var(--gold));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .cta-final p {
+    font-size: 1.15rem;
+    color: rgba(245, 237, 224, 0.65);
+    margin-bottom: 48px;
+    font-weight: 300;
+  }
+  .cta-final .btn-apple-light {
+    background: var(--cream);
+    color: var(--ink);
+    padding: 16px 42px;
+    border-radius: 980px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 16px;
+    letter-spacing: -0.01em;
+    transition: all 0.3s;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .cta-final .btn-apple-light:hover {
+    background: #fff;
+    transform: translateY(-2px);
+    box-shadow: 0 14px 40px rgba(184, 115, 51, 0.4);
+  }
+  .cta-final .price-line {
+    margin-top: 28px;
+    font-size: 0.9rem;
+    color: rgba(245, 237, 224, 0.5);
+  }
+
+  /* ===== FOOTER ===== */
+  .footer {
+    background: var(--bg-warm);
+    padding: 48px 24px;
+    text-align: center;
+    border-top: 1px solid var(--line);
+  }
+  .footer-logo {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-size: 22px;
+    color: var(--ink);
+    margin-bottom: 8px;
+  }
+  .footer-text {
+    font-size: 0.85rem;
+    color: var(--ink-mute);
+    margin-bottom: 4px;
+  }
+  .footer-legal {
+    margin-top: 24px;
+    font-size: 0.75rem;
+    color: var(--ink-mute);
+    opacity: 0.7;
+  }
+
+  /* ===== ANIMATIONS ===== */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-12px); }
+  }
+  @keyframes scrollPulse {
+    0%, 100% { opacity: 0.3; }
+    50% { opacity: 1; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+
+  /* ===== RESPONSIVE ===== */
+  @media (max-width: 768px) {
+    .nav-links { gap: 18px; }
+    .nav-links a:not(.nav-cta) { display: none; }
+    section { padding: 80px 20px; }
+    .problem-grid, .benefits-grid, .testi-grid, .tech-grid {
+      grid-template-columns: 1fr;
+    }
+    .compare-row { grid-template-columns: 1fr; }
+    .compare-row > div { justify-content: flex-start !important; }
+    .compare-row.head { display: none; }
+    .hero { padding: 40px 20px 30px; }
+    .tech-card { padding: 40px 28px; }
+    .testi-card { padding: 28px; }
+    .cta-final { padding: 100px 20px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ===== NAV ===== -->
+<header class="nav">
+  <div class="nav-inner">
+    <a href="#" class="nav-logo">Plasma Flow</a>
+    <nav class="nav-links">
+      <a href="#tecnologia">Tecnología</a>
+      <a href="#beneficios">Beneficios</a>
+      <a href="#especificaciones">Specs</a>
+      <a href="#faq">Preguntas</a>
+      <a href="#comprar" class="nav-cta">Comprar</a>
+    </nav>
+  </div>
+</header>
+
+<!-- ===== HERO ===== -->
+<section class="hero">
+  <span class="hero-eyebrow">Edición Limitada</span>
+
+  <h1 class="hero-title">Plasma <span class="italic">Flow.</span></h1>
+
+  <p class="hero-tagline">Cepillo, rizador y tecnología de plasma. Todo en una sola herramienta.</p>
+
+  <div class="hero-product">
+    <svg viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="barrelGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="#f5e0c0"/>
+          <stop offset="30%" stop-color="#d4a574"/>
+          <stop offset="60%" stop-color="#a06a2e"/>
+          <stop offset="100%" stop-color="#3e2723"/>
+        </linearGradient>
+        <linearGradient id="barrelGlow" x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%" stop-color="#d4af37" stop-opacity="0"/>
+          <stop offset="50%" stop-color="#e8c896" stop-opacity="0.5"/>
+          <stop offset="100%" stop-color="#d4af37" stop-opacity="0"/>
+        </linearGradient>
+        <linearGradient id="handleGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+          <stop offset="0%" stop-color="#3e2723"/>
+          <stop offset="50%" stop-color="#2a1a13"/>
+          <stop offset="100%" stop-color="#1a0e08"/>
+        </linearGradient>
+        <linearGradient id="ringGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%" stop-color="#d4af37"/>
+          <stop offset="100%" stop-color="#b87333"/>
+        </linearGradient>
+        <radialGradient id="endCap" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stop-color="#c9954a"/>
+          <stop offset="100%" stop-color="#3e2723"/>
+        </radialGradient>
+      </defs>
+
+      <g transform="rotate(-20 200 200)">
+        <rect x="80" y="155" width="240" height="58" rx="29" fill="url(#barrelGrad)"/>
+        <rect x="80" y="155" width="240" height="58" rx="29" fill="url(#barrelGlow)"/>
+
+        <g opacity="0.7">
+          <circle cx="110" cy="170" r="2.5" fill="#0f0a06"/>
+          <circle cx="135" cy="167" r="2.5" fill="#0f0a06"/>
+          <circle cx="160" cy="170" r="2.5" fill="#0f0a06"/>
+          <circle cx="185" cy="167" r="2.5" fill="#0f0a06"/>
+          <circle cx="210" cy="170" r="2.5" fill="#0f0a06"/>
+          <circle cx="235" cy="167" r="2.5" fill="#0f0a06"/>
+          <circle cx="260" cy="170" r="2.5" fill="#0f0a06"/>
+          <circle cx="285" cy="170" r="2.5" fill="#0f0a06"/>
+          <circle cx="110" cy="200" r="2.5" fill="#0f0a06"/>
+          <circle cx="135" cy="203" r="2.5" fill="#0f0a06"/>
+          <circle cx="160" cy="200" r="2.5" fill="#0f0a06"/>
+          <circle cx="185" cy="203" r="2.5" fill="#0f0a06"/>
+          <circle cx="210" cy="200" r="2.5" fill="#0f0a06"/>
+          <circle cx="235" cy="203" r="2.5" fill="#0f0a06"/>
+          <circle cx="260" cy="200" r="2.5" fill="#0f0a06"/>
+          <circle cx="285" cy="200" r="2.5" fill="#0f0a06"/>
+        </g>
+
+        <circle cx="80" cy="184" r="29" fill="url(#endCap)"/>
+        <circle cx="80" cy="184" r="22" fill="none" stroke="url(#ringGrad)" stroke-width="2"/>
+        <text x="80" y="188" text-anchor="middle" font-family="Inter, sans-serif" font-size="9" font-weight="800" fill="#fff" letter-spacing="1">PF</text>
+
+        <rect x="100" y="158" width="200" height="2" rx="1" fill="url(#ringGrad)" opacity="0.6"/>
+
+        <rect x="305" y="155" width="4" height="58" rx="2" fill="url(#ringGrad)"/>
+        <rect x="313" y="155" width="2" height="58" fill="#3e2723"/>
+
+        <rect x="316" y="162" width="14" height="44" rx="6" fill="#1f1208"/>
+
+        <path d="M 95 213 Q 130 245 165 290" stroke="#1f1208" stroke-width="32" stroke-linecap="round" fill="none"/>
+        <path d="M 95 213 Q 130 245 165 290" stroke="url(#handleGrad)" stroke-width="28" stroke-linecap="round" fill="none"/>
+
+        <rect x="148" y="285" width="38" height="100" rx="19" fill="url(#handleGrad)"/>
+
+        <circle cx="167" cy="310" r="9" fill="#0f0a06" stroke="#3e2723" stroke-width="1.5"/>
+        <circle cx="167" cy="310" r="3.5" fill="url(#ringGrad)"/>
+
+        <rect x="159" y="325" width="16" height="3" rx="1.5" fill="url(#ringGrad)" opacity="0.9"/>
+        <rect x="159" y="332" width="16" height="3" rx="1.5" fill="url(#ringGrad)" opacity="0.5"/>
+        <rect x="159" y="339" width="16" height="3" rx="1.5" fill="url(#ringGrad)" opacity="0.25"/>
+
+        <text x="167" y="370" text-anchor="middle" font-family="Inter, sans-serif" font-size="6" font-weight="700" fill="#a89888" letter-spacing="1.5">PLASMA</text>
+      </g>
+    </svg>
+  </div>
+
+  <div class="hero-cta">
+    <div class="hero-price">
+      <span class="from">Desde</span>
+      <span class="current">$129.99</span>
+      <span class="original">$189.99</span>
+    </div>
+
+    <a href="#comprar" class="btn-apple">
+      Comprar ahora
+      <span class="arrow">→</span>
+    </a>
+
+    <div class="hero-meta">
+      <div class="hero-meta-item">Envío a todo Panamá</div>
+      <div class="hero-meta-item">Garantía 12 meses</div>
+      <div class="hero-meta-item">Pago con tarjeta o Yappy</div>
+    </div>
+  </div>
+
+  <div class="scroll-cue">
+    <span>Descubre más</span>
+    <span class="line"></span>
+  </div>
+</section>
+
+<!-- ===== PROBLEMA ===== -->
+<section class="section-dark">
+  <div class="section-inner">
+    <span class="section-eyebrow">El problema</span>
+    <h2 class="section-title">Tres herramientas, tres tiempos, <span class="italic">tres veces el daño.</span></h2>
+    <p class="section-lead">Cada vez que peinas tu cabello en casa pasas por lo mismo, mucho tiempo, varias herramientas y un acabado que nunca queda igual al del salón.</p>
+
+    <div class="problem-grid">
+      <div class="problem-card">
+        <div class="problem-num">01</div>
+        <h3>Demasiado tiempo</h3>
+        <p>Secadora, plancha y cepillo. Hasta una hora cada vez para conseguir un resultado decente.</p>
+      </div>
+      <div class="problem-card">
+        <div class="problem-num">02</div>
+        <h3>Daño acumulado</h3>
+        <p>Pasar por tres herramientas calientes seca, debilita y maltrata el cabello con el tiempo.</p>
+      </div>
+      <div class="problem-card">
+        <div class="problem-num">03</div>
+        <h3>Resultado inconsistente</h3>
+        <p>Sin volumen, sin ondas duraderas, sin el brillo que esperas. Repetir todos los días es frustrante.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== TECNOLOGIA ===== -->
+<section class="tech" id="tecnologia">
+  <div class="section-inner">
+    <span class="section-eyebrow">La tecnología</span>
+    <h2 class="section-title">Lo que <span class="italic">no tiene</span> un cepillo común.</h2>
+    <p class="section-lead">Plasma Flow integra dos tecnologías que normalmente solo se encuentran en herramientas profesionales de salón.</p>
+
+    <div class="tech-grid">
+      <div class="tech-card">
+        <span class="tech-tag">Generador de Plasma</span>
+        <h3>Brillo de salón en cada pasada.</h3>
+        <p>El generador de plasma libera iones que sellan la cutícula del cabello, eliminan el frizz y aportan un brillo profesional. El mismo principio que usan los estilistas para ese acabado pulido y de revista.</p>
+      </div>
+      <div class="tech-card alt">
+        <span class="tech-tag">Tecnología Infrarroja</span>
+        <h3>Calor que cuida, no que daña.</h3>
+        <p>El calor infrarrojo penetra el cabello desde adentro hacia afuera. Reduce el daño térmico, estimula el cuero cabelludo y favorece un cabello más fuerte con el tiempo.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== BENEFICIOS ===== -->
+<section class="benefits" id="beneficios">
+  <div class="section-inner">
+    <span class="section-eyebrow">Por qué Plasma Flow</span>
+    <h2 class="section-title">Todo lo que necesitas para <span class="italic">peinarte como en el salón.</span></h2>
+
+    <div class="benefits-grid">
+      <div class="benefit-card">
+        <div class="benefit-icon-wrap">
+          <svg viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+        </div>
+        <h3>Resultados en minutos</h3>
+        <p>Una sola pasada. Sin secadora, sin plancha, sin pasos extra.</p>
+      </div>
+      <div class="benefit-card">
+        <div class="benefit-icon-wrap">
+          <svg viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 3l1.9 5.8L20 9l-4.5 3.5L17 18l-5-3-5 3 1.5-5.5L4 9l6.1-.2z"/></svg>
+        </div>
+        <h3>Brillo que dura</h3>
+        <p>El plasma sella la cutícula y aporta brillo profesional inmediato.</p>
+      </div>
+      <div class="benefit-card">
+        <div class="benefit-icon-wrap">
+          <svg viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.6 1.6a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+        </div>
+        <h3>Cabello protegido</h3>
+        <p>Tecnología infrarroja que minimiza el daño del calor.</p>
+      </div>
+      <div class="benefit-card">
+        <div class="benefit-icon-wrap">
+          <svg viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h0"/></svg>
+        </div>
+        <h3>Tres acabados, una herramienta</h3>
+        <p>Volumen, ondas o forma según cómo lo uses.</p>
+      </div>
+      <div class="benefit-card">
+        <div class="benefit-icon-wrap">
+          <svg viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+        </div>
+        <h3>Bloqueo de seguridad</h3>
+        <p>Bloqueo automático y apagado a los 30 minutos.</p>
+      </div>
+      <div class="benefit-card">
+        <div class="benefit-icon-wrap">
+          <svg viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+        </div>
+        <h3>Voltaje universal</h3>
+        <p>Funciona con 100 a 240V. Llévalo a cualquier viaje.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== ESPECIFICACIONES ===== -->
+<section class="specs" id="especificaciones">
+  <div class="section-inner" style="max-width: 880px;">
+    <span class="section-eyebrow">Especificaciones</span>
+    <h2 class="section-title">Los datos <span class="italic">que importan.</span></h2>
+
+    <div class="specs-table">
+      <div class="spec-row"><div class="spec-label">Voltaje</div><div class="spec-value">100 a 240V, 50/60 Hz</div></div>
+      <div class="spec-row"><div class="spec-label">Potencia</div><div class="spec-value">80W</div></div>
+      <div class="spec-row"><div class="spec-label">Temperatura</div><div class="spec-value">140°C a 232°C (285°F a 450°F)</div></div>
+      <div class="spec-row"><div class="spec-label">Diámetro del barril</div><div class="spec-value">45mm × 100mm de largo</div></div>
+      <div class="spec-row"><div class="spec-label">Tecnología</div><div class="spec-value">Generador de plasma + infrarrojo</div></div>
+      <div class="spec-row"><div class="spec-label">Cable</div><div class="spec-value">Giratorio de 2 metros</div></div>
+      <div class="spec-row"><div class="spec-label">Bloqueo</div><div class="spec-value">Automático, doble pulsación para desbloquear</div></div>
+      <div class="spec-row"><div class="spec-label">Apagado</div><div class="spec-value">Automático a los 30 minutos</div></div>
+      <div class="spec-row"><div class="spec-label">Tipo de cabello</div><div class="spec-value">Solo para cabello seco</div></div>
+      <div class="spec-row"><div class="spec-label">Garantía</div><div class="spec-value">12 meses de fábrica</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== COMPARACION ===== -->
+<section class="compare">
+  <div class="section-inner">
+    <span class="section-eyebrow">Compara</span>
+    <h2 class="section-title">Plasma Flow vs <span class="italic">la rutina tradicional.</span></h2>
+
+    <div class="compare-table">
+      <div class="compare-row head">
+        <div>Característica</div>
+        <div class="pf-col">Plasma Flow</div>
+        <div>Cepillo común</div>
+        <div>Plancha + secador</div>
+      </div>
+      <div class="compare-row">
+        <div>Tres en uno</div>
+        <div class="pf-col"><span class="yes">✓</span></div>
+        <div><span class="no">—</span></div>
+        <div><span class="no">—</span></div>
+      </div>
+      <div class="compare-row">
+        <div>Tecnología de plasma</div>
+        <div class="pf-col"><span class="yes">✓</span></div>
+        <div><span class="no">—</span></div>
+        <div><span class="no">—</span></div>
+      </div>
+      <div class="compare-row">
+        <div>Calor infrarrojo</div>
+        <div class="pf-col"><span class="yes">✓</span></div>
+        <div><span class="no">—</span></div>
+        <div><span class="no">—</span></div>
+      </div>
+      <div class="compare-row">
+        <div>Tiempo de peinado</div>
+        <div class="pf-col">5 a 10 min</div>
+        <div>20 min</div>
+        <div>40 a 60 min</div>
+      </div>
+      <div class="compare-row">
+        <div>Reduce frizz</div>
+        <div class="pf-col"><span class="yes">✓</span></div>
+        <div><span class="no">—</span></div>
+        <div>Parcial</div>
+      </div>
+      <div class="compare-row">
+        <div>Bloqueo de seguridad</div>
+        <div class="pf-col"><span class="yes">✓</span></div>
+        <div><span class="no">—</span></div>
+        <div><span class="no">—</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== TESTIMONIOS ===== -->
+<section class="testi">
+  <div class="section-inner">
+    <span class="section-eyebrow">Lo que dicen</span>
+    <h2 class="section-title">Reseñas <span class="italic">reales de clientas.</span></h2>
+
+    <div class="testi-grid">
+      <div class="testi-card">
+        <div class="testi-stars">★★★★★</div>
+        <p class="testi-quote">"Reduje el tiempo de mi rutina a la mitad. El brillo es real, no es marketing."</p>
+        <div class="testi-author">
+          <div class="testi-avatar">M</div>
+          <div>
+            <div class="testi-name">María L.</div>
+            <div class="testi-role">Verificada</div>
+          </div>
+        </div>
+      </div>
+      <div class="testi-card">
+        <div class="testi-stars">★★★★★</div>
+        <p class="testi-quote">"Tengo el cabello rebelde y este es el primero que me funciona sin maltratarlo."</p>
+        <div class="testi-author">
+          <div class="testi-avatar">A</div>
+          <div>
+            <div class="testi-name">Andrea P.</div>
+            <div class="testi-role">Verificada</div>
+          </div>
+        </div>
+      </div>
+      <div class="testi-card">
+        <div class="testi-stars">★★★★★</div>
+        <p class="testi-quote">"Lo uso todos los días. El bloqueo y el apagado automático me dan tranquilidad."</p>
+        <div class="testi-author">
+          <div class="testi-avatar">S</div>
+          <div>
+            <div class="testi-name">Sofía R.</div>
+            <div class="testi-role">Verificada</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <p class="testi-note">Reseñas de muestra. Se reemplazarán con reseñas reales una vez se reciban.</p>
+  </div>
+</section>
+
+<!-- ===== FAQ ===== -->
+<section class="faq" id="faq">
+  <div class="section-inner">
+    <span class="section-eyebrow">Preguntas frecuentes</span>
+    <h2 class="section-title">Lo que <span class="italic">más preguntan.</span></h2>
+
+    <div class="faq-list">
+      <details class="faq-item">
+        <summary>¿Funciona en cabello mojado?</summary>
+        <div class="answer">No. Plasma Flow está diseñado únicamente para cabello seco. Para cabello mojado se recomienda secarlo primero con una toalla o secadora.</div>
+      </details>
+      <details class="faq-item">
+        <summary>¿Sirve para todo tipo de cabello?</summary>
+        <div class="answer">Sí. Funciona en cabello fino, grueso, liso, ondulado y con rizos. La temperatura ajustable de 140°C a 232°C permite adaptarlo a cada tipo.</div>
+      </details>
+      <details class="faq-item">
+        <summary>¿Cuánto tiempo dura el peinado?</summary>
+        <div class="answer">Gracias al sellado de la cutícula con tecnología de plasma, el peinado se mantiene durante todo el día y resiste mejor la humedad que con métodos tradicionales.</div>
+      </details>
+      <details class="faq-item">
+        <summary>¿Daña el cabello con el uso diario?</summary>
+        <div class="answer">No. La tecnología infrarroja minimiza el daño térmico que producen las herramientas convencionales. Aun así, recomendamos usar siempre un protector térmico.</div>
+      </details>
+      <details class="faq-item">
+        <summary>¿Puedo viajar con él?</summary>
+        <div class="answer">Sí. Funciona con voltaje universal de 100 a 240V, así que puedes usarlo en cualquier país sin necesidad de adaptador de voltaje.</div>
+      </details>
+      <details class="faq-item">
+        <summary>¿Cuánto tarda el envío en Panamá?</summary>
+        <div class="answer">El envío dentro de la Ciudad de Panamá toma de 1 a 2 días hábiles. Al interior toma de 3 a 5 días hábiles.</div>
+      </details>
+      <details class="faq-item">
+        <summary>¿Tiene garantía?</summary>
+        <div class="answer">Sí. Plasma Flow cuenta con garantía de fábrica por 12 meses contra defectos de manufactura.</div>
+      </details>
+    </div>
+  </div>
+</section>
+
+<!-- ===== GARANTIA ===== -->
+<section class="warranty">
+  <div class="section-inner">
+    <div class="warranty-icon">
+      <svg viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.6 1.6a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+    </div>
+    <span class="section-eyebrow">Garantía</span>
+    <h2 class="section-title">Doce meses <span class="italic">de tranquilidad.</span></h2>
+    <p class="section-lead">Si tu Plasma Flow presenta cualquier defecto de fábrica dentro del primer año, te lo cambiamos sin preguntas.</p>
+  </div>
+</section>
+
+<!-- ===== CTA FINAL ===== -->
+<section class="cta-final" id="comprar">
+  <div class="cta-final-inner">
+    <h2>Lista para <span class="italic">tu mejor cabello.</span></h2>
+    <p>Edición limitada con descuento de lanzamiento.</p>
+
+    <a href="#" class="btn-apple-light">
+      Comprar ahora
+      <span>→</span>
+    </a>
+
+    <p class="price-line">Desde $129.99 USD · Envío a todo Panamá · Garantía 12 meses</p>
+  </div>
+</section>
+
+<!-- ===== FOOTER ===== -->
+<footer class="footer">
+  <div class="footer-logo">Plasma Flow</div>
+  <p class="footer-text">Cepillo rizador con tecnología de plasma e infrarrojo.</p>
+  <p class="footer-text">Panamá, Rep. de Panamá</p>
+  <p class="footer-legal">© 2026 Plasma Flow. Todos los derechos reservados.</p>
+</footer>
+
+</body>
+</html>
